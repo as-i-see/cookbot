@@ -2,7 +2,11 @@ package dev.asisee.cookbot.bot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -13,6 +17,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class CookBot
   extends TelegramLongPollingBot {
+  private DB db;
+  private ConcurrentMap<Long, String> map;
+
+  public CookBot() {
+    super();
+    db = DBMaker.tempFileDB().fileMmapEnable().make();
+    map = db.hashMap("map", Serializer.LONG, Serializer.STRING).createOrOpen();
+  }
 
   @Override
   public void onUpdateReceived(
@@ -20,11 +32,12 @@ public class CookBot
   ) {// We check if the update has a message and the message has text
 
     if (update.hasMessage() && update.getMessage().hasText()) {
-      SendMessage message = new SendMessage(
-
-      ).// Create a SendMessage object with mandatory fields
+      map.put(update.getMessage().getChatId(), update.getMessage().getText());
+      StringBuilder stringBuilder = new StringBuilder("You have already sent:\n");
+      map.forEach((chatId, messageText)->stringBuilder.append(messageText).append("\n"));
+      SendMessage message = new SendMessage().// Create a SendMessage object with mandatory fields
       setChatId(update.getMessage().getChatId()).setText(
-        update.getMessage().getText()
+         stringBuilder.toString()
       ).setReplyMarkup(getRootMenu());
       try {
         execute(message); // Call method to send the message
