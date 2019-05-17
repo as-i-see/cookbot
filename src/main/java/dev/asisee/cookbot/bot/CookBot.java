@@ -18,33 +18,33 @@ public class CookBot extends TelegramLongPollingBot {
   private static final URI cloudRedisURI =
       URI.create(
           "redis://h:p4426bdca631eb9bff2f2ce99c4799ede68fb59900642e47783781d87a5986cb2@ec2-99-80-37-150.eu-west-1.compute.amazonaws.com:17669");
-  static final JedisPool pool = new JedisPool(new JedisPoolConfig(), cloudRedisURI);
+  static final JedisPool pool = new JedisPool(new JedisPoolConfig(), CookBot.cloudRedisURI);
 
   @Override
   public void onClosing() {
     super.onClosing();
-    pool.close();
+    CookBot.pool.close();
   }
 
   @Override
-  public void onUpdateReceived(Update update) {
+  public void onUpdateReceived(final Update update) {
     //    Message message = update.getMessage();
     if (update.hasMessage() && update.getMessage().hasText()) {
-      StringBuilder stringBuilder = new StringBuilder("You have already sent:\n");
-      try (Jedis jedis = pool.getResource()) {
+      final StringBuilder stringBuilder = new StringBuilder("You have already sent:\n");
+      try (final Jedis jedis = CookBot.pool.getResource()) {
         jedis.zadd(update.getMessage().getChatId().toString(), 0, update.getMessage().getText());
         jedis
             .zrange(update.getMessage().getChatId().toString(), 0, -1)
             .forEach(stringBuilder::append);
       }
-      SendMessage message =
+      final SendMessage message =
           new SendMessage()
               .setChatId(update.getMessage().getChatId())
               .setText(stringBuilder.toString())
-              .setReplyMarkup(getRootMenu());
+              .setReplyMarkup(this.getRootMenu());
       try {
-          execute(message); // Call method to send the message
-      } catch (TelegramApiException e) {
+        this.execute(message); // Call method to send the message
+      } catch (final TelegramApiException e) {
         e.printStackTrace();
       }
     }
@@ -61,9 +61,9 @@ public class CookBot extends TelegramLongPollingBot {
   }
 
   private ReplyKeyboardMarkup getRootMenu() {
-    ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+    final ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
     // Create the keyboard (list of keyboard rows)
-    List<KeyboardRow> keyboard = new ArrayList<>();
+    final List<KeyboardRow> keyboard = new ArrayList<>();
     // Create a keyboard row
     KeyboardRow row = new KeyboardRow();
     // Set each button, you can also use KeyboardButton objects if you need something else than text
