@@ -18,7 +18,7 @@ public class CookBot
   extends TelegramLongPollingBot {
   static final JedisPool pool = new JedisPool(
     new JedisPoolConfig(),
-    "redis://rediscloud:O8fM207KvSYR4OzH473Lp6DUUkregDms@redis-13478.c3.eu-west-1-2.ec2.cloud.redislabs.com:13478"
+    "redis-13478.c3.eu-west-1-2.ec2.cloud.redislabs.com", 13478, 1000, "O8fM207KvSYR4OzH473Lp6DUUkregDms"
   );
 
   @Override
