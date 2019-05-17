@@ -12,8 +12,13 @@ repositories {
 
 dependencies {
     implementation "org.telegram:telegrambots:4.2"
+<<<<<<< Updated upstream
     implementation 'org.apache.commons:commons-pool2:2.6.2'
     implementation 'redis.clients:jedis:3.1.0-m1'
+=======
+    implementation 'org.mapdb:mapdb:3.0.7'
+
+>>>>>>> Stashed changes
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
