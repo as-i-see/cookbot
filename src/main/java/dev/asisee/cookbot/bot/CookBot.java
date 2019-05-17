@@ -18,7 +18,7 @@ public class CookBot
   extends TelegramLongPollingBot {
   static final JedisPool pool = new JedisPool(
     new JedisPoolConfig(),
-    "redis-13478.c3.eu-west-1-2.ec2.cloud.redislabs.com", 13478, 10000, "O8fM207KvSYR4OzH473Lp6DUUkregDms"
+    "redis://rediscloud:O8fM207KvSYR4OzH473Lp6DUUkregDms@redis-13478.c3.eu-west-1-2.ec2.cloud.redislabs.com:13478"
   );
 
   @Override
@@ -39,14 +39,13 @@ public class CookBot
           0,
           update.getMessage().getText()
         );
-        jedis.zrange("sose", 0, -1).forEach(stringBuilder::append);
+        jedis.zrange(update.getMessage().getChatId().toString(), 0, -1).forEach(
+          stringBuilder::append
+        );
       }
-      SendMessage message = new SendMessage(
-
-      ).// Create a SendMessage object with mandatory fields
-      setChatId(update.getMessage().getChatId()).setText(
-        stringBuilder.toString()
-      ).setReplyMarkup(getRootMenu());
+      SendMessage message = new SendMessage().setChatId(
+        update.getMessage().getChatId()
+      ).setText(stringBuilder.toString()).setReplyMarkup(getRootMenu());
       try {
         execute(message); // Call method to send the message
       } catch(TelegramApiException e) {
